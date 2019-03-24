@@ -1,7 +1,55 @@
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
+enum Holidays {
+    Neujahr,
+    HeiligeDreiKoenige,
+    Frauentag,
+    Karfreitag,
+    Ostersonntag,
+    Ostermontag,
+    ErsterMai,
+    ChristiHimmelfahrt,
+    Pfingstsonntag,
+    Pfingstmontag,
+    Fronleichnam,
+    AugsburgerFriedensfest,
+    MariaeHimmelfahrt,
+    Weltkindertag,
+    TagDerDeutschenEinheit,
+    Reformationstag,
+    Allerheiligen,
+    BussUndBettag,
+    ErsterWeihnachtsfeiertag,
+    ZweiterWeihnachtsfeiertag,
 }
+
+enum Regions {
+    BadenWuerttemberg,
+    Bayern,
+    Berlin,
+    Brandenburg,
+    Bremen,
+    Hamburg,
+    Hessen,
+    MechlenburgVorpommern,
+    Niedersachsen,
+    NordrheinWestfalen,
+    RheinlandPfalz,
+    Saarland,
+    Sachsen,
+    SachsenAnhalt,
+    SchleswigHolstein,
+    Thueringen,
+}
+
+const BUNDESWEITE_FEIERTAGE: &'static [Holidays] = &[
+    Holidays::Neujahr,
+    Holidays::Karfreitag,
+    Holidays::Ostersonntag,
+    Holidays::Ostermontag,
+    Holidays::ErsterMai,
+    Holidays::ChristiHimmelfahrt,
+    Holidays::Pfingstsonntag,
+    Holidays::Pfingstmontag,
+    Holidays::TagDerDeutschenEinheit,
+    Holidays::ErsterWeihnachtsfeiertag,
+    Holidays::ZweiterWeihnachtsfeiertag,
+];
