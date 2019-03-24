@@ -5,3 +5,4 @@ authors = ["Hannes Herrmann <hannes.herrmann@tngtech.com>"]
 edition = "2018"
 
 [dependencies]
+chrono = "0.4"
