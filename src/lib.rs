@@ -25,36 +25,40 @@ enum GermanHolidays {
     ZweiterWeihnachtsfeiertag,
 }
 
-fn date(year: i32, month: u32, day: u32) -> NaiveDate {
-    NaiveDate::from_ymd(year, month, day)
+fn date(year: i32, month: u32, day: u32) -> Option<NaiveDate> {
+    Some(NaiveDate::from_ymd(year, month, day))
 }
 
-fn oster_sonntag(year: i32) -> NaiveDate {
+fn oster_sonntag(year: i32) -> Option<NaiveDate> {
     panic!("unimplemented")
 }
 
-fn bus_und_bettag(year: i32) -> NaiveDate {
+fn relative_to_easter_sunday(year: i32, days_offset: i64) -> Option<NaiveDate> {
+    oster_sonntag(year).map(|date| date + Duration::days(days_offset))
+}
+
+fn bus_und_bettag(year: i32) -> Option<NaiveDate> {
     panic!("unimplemented")
 }
 
 trait Holiday {
-    fn to_date(&self, year: i32) -> NaiveDate;
+    fn to_date(&self, year: i32) -> Option<NaiveDate>;
 }
 
 impl Holiday for GermanHolidays {
-    fn to_date(&self, year: i32) -> NaiveDate {
+    fn to_date(&self, year: i32) -> Option<NaiveDate> {
         match self {
             GermanHolidays::Neujahr => date(year, 1, 1),
             GermanHolidays::HeiligeDreiKoenige => date(year, 1, 6),
             GermanHolidays::Frauentag => date(year, 1, 8),
-            GermanHolidays::Karfreitag => oster_sonntag(year) - Duration::days(2),
+            GermanHolidays::Karfreitag => relative_to_easter_sunday(year, -2),
             GermanHolidays::Ostersonntag => oster_sonntag(year),
-            GermanHolidays::Ostermontag => oster_sonntag(year) + Duration::days(1),
+            GermanHolidays::Ostermontag => relative_to_easter_sunday(year, 1),
             GermanHolidays::ErsterMai => date(year, 5, 1),
-            GermanHolidays::ChristiHimmelfahrt => oster_sonntag(year) + Duration::days(39),
-            GermanHolidays::Pfingstsonntag => oster_sonntag(year) + Duration::days(49),
-            GermanHolidays::Pfingstmontag => oster_sonntag(year) + Duration::days(50),
-            GermanHolidays::Fronleichnam => oster_sonntag(year) + Duration::days(60),
+            GermanHolidays::ChristiHimmelfahrt => relative_to_easter_sunday(year, 39),
+            GermanHolidays::Pfingstsonntag => relative_to_easter_sunday(year, 49),
+            GermanHolidays::Pfingstmontag => relative_to_easter_sunday(year, 50),
+            GermanHolidays::Fronleichnam => relative_to_easter_sunday(year, 60),
             GermanHolidays::AugsburgerFriedensfest => date(year, 8, 8),
             GermanHolidays::MariaeHimmelfahrt => date(year, 8, 15),
             GermanHolidays::Weltkindertag => date(year, 9, 20),
@@ -163,37 +167,43 @@ where
 {
     fn is_holiday(&self, date: NaiveDate) -> bool;
     fn holiday_from_date(&self, date: NaiveDate) -> Option<H>;
+    fn holidays_in_year(&self, year: i32) -> Vec<H>;
 }
 
 impl Region<GermanHolidays> for Germany {
     fn is_holiday(&self, date: NaiveDate) -> bool {
         self.holidays()
-            .any(|holiday| holiday.to_date(date.year()) == date)
+            .any(|holiday| holiday.to_date(date.year()) == Some(date))
     }
     fn holiday_from_date(&self, date: NaiveDate) -> Option<GermanHolidays> {
         self.holidays()
-            .find(|holiday| holiday.to_date(date.year()) == date)
+            .find(|holiday| holiday.to_date(date.year()) == Some(date))
+    }
+    fn holidays_in_year(&self, year: i32) -> Vec<GermanHolidays> {
+        self.holidays()
+            .filter(|holiday| holiday.to_date(year).is_some())
+            .collect()
     }
 }
 
-trait IntoHoliday<T, H>
+trait IntoHoliday<R, H>
 where
     H: Holiday,
-    T: Region<H>,
+    R: Region<H>,
 {
-    fn is_holiday(&self, region: T) -> bool;
-    fn holiday(&self, region: T) -> Option<H>;
+    fn is_holiday(&self, region: R) -> bool;
+    fn holiday(&self, region: R) -> Option<H>;
 }
 
-impl<T, H> IntoHoliday<T, H> for NaiveDate
+impl<R, H> IntoHoliday<R, H> for NaiveDate
 where
     H: Holiday,
-    T: Region<H>,
+    R: Region<H>,
 {
-    fn is_holiday(&self, region: T) -> bool {
+    fn is_holiday(&self, region: R) -> bool {
         region.is_holiday(*self)
     }
-    fn holiday(&self, region: T) -> Option<H> {
+    fn holiday(&self, region: R) -> Option<H> {
         region.holiday_from_date(*self)
     }
 }
