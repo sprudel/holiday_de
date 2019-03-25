@@ -64,7 +64,7 @@ impl Holidays {
     }
 }
 
-enum Regions {
+enum Germany {
     BadenWuerttemberg,
     Bayern,
     Berlin,
@@ -97,71 +97,81 @@ const BUNDESWEITE_FEIERTAGE: &'static [Holidays] = &[
     Holidays::ZweiterWeihnachtsfeiertag,
 ];
 
-impl Regions {
+impl Germany {
     fn holidays(&self) -> impl Iterator<Item=Holidays> {
         BUNDESWEITE_FEIERTAGE.iter().cloned()
             .chain(self.region_specific_holidays().iter().cloned())
     }
 
-    fn is_holiday(&self, date: NaiveDate) -> bool {
-        self.holidays()
-            .any(|holiday| holiday.to_date(date.year()) == date)
-    }
-
-
     fn region_specific_holidays(&self) -> &'static [Holidays] {
         match self {
-            Regions::BadenWuerttemberg =>
+            Germany::BadenWuerttemberg =>
                 &[Holidays::HeiligeDreiKoenige,
                     Holidays::Fronleichnam,
                     Holidays::Allerheiligen],
-            Regions::Bayern =>
+            Germany::Bayern =>
                 &[Holidays::HeiligeDreiKoenige,
                     Holidays::Fronleichnam,
                     Holidays::MariaeHimmelfahrt,
                     Holidays::Allerheiligen],
-            Regions::Berlin => &[Holidays::Frauentag],
-            Regions::Brandenburg => &[Holidays::Reformationstag],
-            Regions::Bremen => &[Holidays::Reformationstag],
-            Regions::Hamburg => &[Holidays::Reformationstag],
-            Regions::Hessen => &[Holidays::Fronleichnam],
-            Regions::MechlenburgVorpommern => &[Holidays::Reformationstag],
-            Regions::Niedersachsen => &[Holidays::Reformationstag],
-            Regions::NordrheinWestfalen => &[Holidays::Fronleichnam, Holidays::Allerheiligen],
-            Regions::RheinlandPfalz => &[Holidays::Fronleichnam, Holidays::Allerheiligen],
-            Regions::Saarland =>
+            Germany::Berlin => &[Holidays::Frauentag],
+            Germany::Brandenburg => &[Holidays::Reformationstag],
+            Germany::Bremen => &[Holidays::Reformationstag],
+            Germany::Hamburg => &[Holidays::Reformationstag],
+            Germany::Hessen => &[Holidays::Fronleichnam],
+            Germany::MechlenburgVorpommern => &[Holidays::Reformationstag],
+            Germany::Niedersachsen => &[Holidays::Reformationstag],
+            Germany::NordrheinWestfalen => &[Holidays::Fronleichnam, Holidays::Allerheiligen],
+            Germany::RheinlandPfalz => &[Holidays::Fronleichnam, Holidays::Allerheiligen],
+            Germany::Saarland =>
                 &[Holidays::Fronleichnam, Holidays::MariaeHimmelfahrt, Holidays::Allerheiligen],
-            Regions::Sachsen => &[Holidays::Reformationstag, Holidays::BussUndBettag],
-            Regions::SachsenAnhalt => &[Holidays::HeiligeDreiKoenige, Holidays::Reformationstag],
-            Regions::SchleswigHolstein => &[Holidays::Reformationstag],
-            Regions::Thueringen => &[Holidays::Weltkindertag, Holidays::Reformationstag],
+            Germany::Sachsen => &[Holidays::Reformationstag, Holidays::BussUndBettag],
+            Germany::SachsenAnhalt => &[Holidays::HeiligeDreiKoenige, Holidays::Reformationstag],
+            Germany::SchleswigHolstein => &[Holidays::Reformationstag],
+            Germany::Thueringen => &[Holidays::Weltkindertag, Holidays::Reformationstag],
         }
     }
 }
 
-trait Holiday {
-    fn is_holiday(&self, region: Regions) -> bool;
-    fn holiday(&self, region: Regions) -> Option<Holidays>;
+trait Region {
+    fn is_holiday(&self, date: NaiveDate) -> bool;
+    fn holiday_from_date(&self, date: NaiveDate) -> Option<Holidays>;
 }
 
-impl Holiday for NaiveDate {
-    fn is_holiday(&self, region: Regions) -> bool {
+impl Region for Germany {
+    fn is_holiday(&self, date: NaiveDate) -> bool {
+        self.holidays()
+            .any(|holiday| holiday.to_date(date.year()) == date)
+    }
+    fn holiday_from_date(&self, date: NaiveDate) -> Option<Holidays> {
+        self.holidays().find(|holiday| holiday.to_date(date.year()) == date)
+    }
+}
+
+
+trait IntoHoliday<T> where T: Region {
+    fn is_holiday(&self, region: T) -> bool;
+    fn holiday(&self, region: T) -> Option<Holidays>;
+}
+
+impl<T: Region> IntoHoliday<T> for NaiveDate {
+    fn is_holiday(&self, region: T) -> bool {
         region.is_holiday(*self)
     }
-    fn holiday(&self, region: Regions) -> Option<Holidays> {
-        region.holidays().find(|holiday| holiday.to_date(self.year()) == *self)
+    fn holiday(&self, region: T) -> Option<Holidays> {
+        region.holiday_from_date(*self)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use chrono::NaiveDate;
-    use crate::{Holiday, Regions, Holidays};
+    use crate::{IntoHoliday, Germany, Holidays};
 
     #[test]
     fn neujahr_feiertag_in_bayern() {
         let date = NaiveDate::from_ymd(2018, 01, 01);
-        assert!(date.is_holiday(Regions::Bayern));
-        assert_eq!(date.holiday(Regions::Bayern), Some(Holidays::Neujahr))
+        assert!(date.is_holiday(Germany::Bayern));
+        assert_eq!(date.holiday(Germany::Bayern), Some(Holidays::Neujahr))
     }
 }
