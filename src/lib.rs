@@ -1,6 +1,7 @@
-use chrono::NaiveDate;
+use chrono::{NaiveDate, Datelike};
 use chrono::Duration;
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum Holidays {
     Neujahr,
     HeiligeDreiKoenige,
@@ -37,7 +38,7 @@ fn bus_und_bettag(year: i32) -> NaiveDate {
 }
 
 impl Holidays {
-    fn as_date(&self, year: i32) -> NaiveDate {
+    fn to_date(&self, year: i32) -> NaiveDate {
         match self {
             Holidays::Neujahr => date(year, 1, 1),
             Holidays::HeiligeDreiKoenige => date(year, 1, 6),
@@ -50,7 +51,7 @@ impl Holidays {
             Holidays::Pfingstsonntag => oster_sonntag(year) + Duration::days(49),
             Holidays::Pfingstmontag => oster_sonntag(year) + Duration::days(50),
             Holidays::Fronleichnam => oster_sonntag(year) + Duration::days(60),
-            Holidays::AugsburgerFriedensfest => date(year, 8,8),
+            Holidays::AugsburgerFriedensfest => date(year, 8, 8),
             Holidays::MariaeHimmelfahrt => date(year, 8, 15),
             Holidays::Weltkindertag => date(year, 9, 20),
             Holidays::TagDerDeutschenEinheit => date(year, 10, 3),
@@ -97,6 +98,17 @@ const BUNDESWEITE_FEIERTAGE: &'static [Holidays] = &[
 ];
 
 impl Regions {
+    fn holidays(&self) -> impl Iterator<Item=Holidays> {
+        BUNDESWEITE_FEIERTAGE.iter().cloned()
+            .chain(self.region_specific_holidays().iter().cloned())
+    }
+
+    fn is_holiday(&self, date: NaiveDate) -> bool {
+        self.holidays()
+            .any(|holiday| holiday.to_date(date.year()) == date)
+    }
+
+
     fn region_specific_holidays(&self) -> &'static [Holidays] {
         match self {
             Regions::BadenWuerttemberg =>
@@ -124,5 +136,32 @@ impl Regions {
             Regions::SchleswigHolstein => &[Holidays::Reformationstag],
             Regions::Thueringen => &[Holidays::Weltkindertag, Holidays::Reformationstag],
         }
+    }
+}
+
+trait Holiday {
+    fn is_holiday(&self, region: Regions) -> bool;
+    fn holiday(&self, region: Regions) -> Option<Holidays>;
+}
+
+impl Holiday for NaiveDate {
+    fn is_holiday(&self, region: Regions) -> bool {
+        region.is_holiday(*self)
+    }
+    fn holiday(&self, region: Regions) -> Option<Holidays> {
+        region.holidays().find(|holiday| holiday.to_date(self.year()) == *self)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use chrono::NaiveDate;
+    use crate::{Holiday, Regions, Holidays};
+
+    #[test]
+    fn neujahr_feiertag_in_bayern() {
+        let date = NaiveDate::from_ymd(2018, 01, 01);
+        assert!(date.is_holiday(Regions::Bayern));
+        assert_eq!(date.holiday(Regions::Bayern), Some(Holidays::Neujahr))
     }
 }
