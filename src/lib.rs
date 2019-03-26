@@ -167,7 +167,7 @@ where
 {
     fn is_holiday(&self, date: NaiveDate) -> bool;
     fn holiday_from_date(&self, date: NaiveDate) -> Option<H>;
-    fn holidays_in_year(&self, year: i32) -> Vec<H>;
+    fn holidays_in_year(&self, year: i32) -> Vec<(NaiveDate, H)>;
 }
 
 impl Region<GermanHolidays> for Germany {
@@ -179,14 +179,16 @@ impl Region<GermanHolidays> for Germany {
         self.holidays()
             .find(|holiday| holiday.to_date(date.year()) == Some(date))
     }
-    fn holidays_in_year(&self, year: i32) -> Vec<GermanHolidays> {
+    fn holidays_in_year(&self, year: i32) -> Vec<(NaiveDate, GermanHolidays)> {
         self.holidays()
-            .filter(|holiday| holiday.to_date(year).is_some())
+            .map(|holiday| (holiday.to_date(year), holiday))
+            .filter(|(date, _)| date.is_some())
+            .map(|(date, holiday)| (date.unwrap(), holiday))
             .collect()
     }
 }
 
-trait IntoHoliday<R, H>
+trait TryHoliday<R, H>
 where
     H: Holiday,
     R: Region<H>,
@@ -195,7 +197,7 @@ where
     fn holiday(&self, region: R) -> Option<H>;
 }
 
-impl<R, H> IntoHoliday<R, H> for NaiveDate
+impl<R, H> TryHoliday<R, H> for NaiveDate
 where
     H: Holiday,
     R: Region<H>,
@@ -210,7 +212,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::{GermanHolidays, Germany, IntoHoliday};
+    use crate::{GermanHolidays, Germany, TryHoliday};
     use chrono::NaiveDate;
 
     #[test]
