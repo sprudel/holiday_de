@@ -213,13 +213,34 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::{GermanHolidays::*, Germany::*, TryHoliday};
+    use crate::{GermanHolidays, GermanHolidays::*, Germany, Germany::*, Region, TryHoliday};
     use chrono::{Datelike, NaiveDate};
 
     #[test]
     fn neujahr_feiertag_in_bayern() {
         let date = NaiveDate::from_ymd(2018, 01, 01);
         assert!(date.is_holiday(Bayern));
-        assert_eq!(date.holiday(Bayern), Some(Neujahr))
+        assert_eq!(Some(Neujahr), date.holiday(Bayern));
+    }
+
+    #[test]
+    fn total_number_holidays() {
+        let number_holidays = |region: Germany| region.holidays_in_year(2019).len();
+        assert_eq!(12, number_holidays(BadenWuerttemberg));
+        assert_eq!(13, number_holidays(Bayern));
+        assert_eq!(10, number_holidays(Berlin));
+        assert_eq!(10, number_holidays(Brandenburg));
+        assert_eq!(10, number_holidays(Bremen));
+        assert_eq!(10, number_holidays(Hamburg));
+        assert_eq!(10, number_holidays(Hessen));
+        assert_eq!(10, number_holidays(MechlenburgVorpommern));
+        assert_eq!(10, number_holidays(Niedersachsen));
+        assert_eq!(11, number_holidays(NordrheinWestfalen));
+        assert_eq!(11, number_holidays(RheinlandPfalz));
+        assert_eq!(12, number_holidays(Saarland));
+        assert_eq!(11, number_holidays(Sachsen));
+        assert_eq!(11, number_holidays(SachsenAnhalt));
+        assert_eq!(10, number_holidays(SchleswigHolstein));
+        assert_eq!(11, number_holidays(Thueringen));
     }
 }
