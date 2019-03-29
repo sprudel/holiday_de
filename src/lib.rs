@@ -97,11 +97,9 @@ enum Germany {
 const BUNDESWEITE_FEIERTAGE: &'static [GermanHolidays] = &[
     GermanHolidays::Neujahr,
     GermanHolidays::Karfreitag,
-    GermanHolidays::Ostersonntag,
     GermanHolidays::Ostermontag,
     GermanHolidays::ErsterMai,
     GermanHolidays::ChristiHimmelfahrt,
-    GermanHolidays::Pfingstsonntag,
     GermanHolidays::Pfingstmontag,
     GermanHolidays::TagDerDeutschenEinheit,
     GermanHolidays::ErsterWeihnachtsfeiertag,
