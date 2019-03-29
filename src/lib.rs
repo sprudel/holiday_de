@@ -1,5 +1,6 @@
 use chrono::Duration;
 use chrono::{Datelike, NaiveDate};
+use std::collections::BTreeMap;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum GermanHolidays {
@@ -167,7 +168,7 @@ where
 {
     fn is_holiday(&self, date: NaiveDate) -> bool;
     fn holiday_from_date(&self, date: NaiveDate) -> Option<H>;
-    fn holidays_in_year(&self, year: i32) -> Vec<(NaiveDate, H)>;
+    fn holidays_in_year(&self, year: i32) -> BTreeMap<NaiveDate, H>;
 }
 
 impl Region<GermanHolidays> for Germany {
@@ -179,7 +180,7 @@ impl Region<GermanHolidays> for Germany {
         self.holidays()
             .find(|holiday| holiday.to_date(date.year()) == Some(date))
     }
-    fn holidays_in_year(&self, year: i32) -> Vec<(NaiveDate, GermanHolidays)> {
+    fn holidays_in_year(&self, year: i32) -> BTreeMap<NaiveDate, GermanHolidays> {
         self.holidays()
             .map(|holiday| (holiday.to_date(year), holiday))
             .filter(|(date, _)| date.is_some())
@@ -212,13 +213,13 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::{GermanHolidays, Germany, TryHoliday};
-    use chrono::NaiveDate;
+    use crate::{GermanHolidays::*, Germany::*, TryHoliday};
+    use chrono::{Datelike, NaiveDate};
 
     #[test]
     fn neujahr_feiertag_in_bayern() {
         let date = NaiveDate::from_ymd(2018, 01, 01);
-        assert!(date.is_holiday(Germany::Bayern));
-        assert_eq!(date.holiday(Germany::Bayern), Some(GermanHolidays::Neujahr))
+        assert!(date.is_holiday(Bayern));
+        assert_eq!(date.holiday(Bayern), Some(Neujahr))
     }
 }
