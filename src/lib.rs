@@ -1,5 +1,6 @@
 use chrono::Duration;
 use chrono::{Datelike, NaiveDate};
+use computus;
 use std::collections::BTreeMap;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -31,7 +32,8 @@ fn date(year: i32, month: u32, day: u32) -> Option<NaiveDate> {
 }
 
 fn oster_sonntag(year: i32) -> Option<NaiveDate> {
-    panic!("unimplemented")
+    let date = computus::gregorian(year).ok()?;
+    NaiveDate::from_ymd_opt(date.year, date.month, date.day)
 }
 
 fn relative_to_easter_sunday(year: i32, days_offset: i64) -> Option<NaiveDate> {
