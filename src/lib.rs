@@ -1,5 +1,5 @@
-use chrono::{Duration, Weekday};
 use chrono::{Datelike, NaiveDate};
+use chrono::{Duration, Weekday};
 use computus;
 use std::collections::BTreeMap;
 
@@ -42,7 +42,7 @@ fn relative_to_easter_sunday(year: i32, days_offset: i64) -> Option<NaiveDate> {
 
 fn bus_und_bettag(year: i32) -> Option<NaiveDate> {
     let reference_date = NaiveDate::from_ymd(year, 11, 23);
-    let weekday_ordinal= i64::from(reference_date.weekday().num_days_from_monday());
+    let weekday_ordinal = i64::from(reference_date.weekday().num_days_from_monday());
     let duration_to_previous_wednesday = if weekday_ordinal < 3 {
         Duration::days(-(weekday_ordinal + 5))
     } else {
@@ -163,8 +163,8 @@ impl Germany {
 }
 
 trait HolidayRegion<H>
-    where
-        H: Holiday,
+where
+    H: Holiday,
 {
     fn holidays(&self) -> Vec<H>;
 
@@ -200,18 +200,18 @@ impl HolidayRegion<GermanHolidays> for Germany {
 }
 
 trait ToHoliday<R, H>
-    where
-        H: Holiday,
-        R: HolidayRegion<H>,
+where
+    H: Holiday,
+    R: HolidayRegion<H>,
 {
     fn is_holiday(&self, region: R) -> bool;
     fn holiday(&self, region: R) -> Option<H>;
 }
 
 impl<R, H> ToHoliday<R, H> for NaiveDate
-    where
-        H: Holiday,
-        R: HolidayRegion<H>,
+where
+    H: Holiday,
+    R: HolidayRegion<H>,
 {
     fn is_holiday(&self, region: R) -> bool {
         region.is_holiday(*self)
@@ -223,8 +223,12 @@ impl<R, H> ToHoliday<R, H> for NaiveDate
 
 #[cfg(test)]
 mod tests {
-    use crate::{GermanHolidays, GermanHolidays::*, Germany, Germany::*, HolidayRegion, ToHoliday, bus_und_bettag, date};
-    use chrono::{Datelike, NaiveDate};
+    use crate::{
+        bus_und_bettag, date, GermanHolidays, GermanHolidays::*, Germany, Germany::*,
+        HolidayRegion, ToHoliday,
+    };
+    use chrono::{Datelike, NaiveDate, Weekday};
+    use proptest::prelude::*;
 
     #[test]
     fn neujahr_feiertag_in_bayern() {
@@ -262,5 +266,16 @@ mod tests {
         assert_eq!(date(2021, 11, 17), bus_und_bettag(2021));
         assert_eq!(date(2022, 11, 16), bus_und_bettag(2022));
         assert_eq!(date(2023, 11, 22), bus_und_bettag(2023));
+    }
+
+    proptest! {
+    #[test]
+    fn test_bus_und_bettag_is_wed_before_23th_nov(y in 1i32..2999) {
+        let date = bus_und_bettag(y).unwrap();
+        assert_eq!(Weekday::Wed, date.weekday());
+        let duration = date.signed_duration_since(NaiveDate::from_ymd(y, 11, 23));
+        assert!(duration.num_days() <= -1);
+        assert!(duration.num_days() >= -7);
+    }
     }
 }
