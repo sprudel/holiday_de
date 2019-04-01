@@ -155,7 +155,7 @@ impl Germany {
     }
 }
 
-trait Region<H>
+trait HolidayRegion<H>
 where
     H: Holiday,
 {
@@ -182,7 +182,7 @@ where
     }
 }
 
-impl Region<GermanHolidays> for Germany {
+impl HolidayRegion<GermanHolidays> for Germany {
     fn holidays(&self) -> Vec<GermanHolidays> {
         BUNDESWEITE_FEIERTAGE
             .iter()
@@ -192,19 +192,19 @@ impl Region<GermanHolidays> for Germany {
     }
 }
 
-trait TryHoliday<R, H>
+trait ToHoliday<R, H>
 where
     H: Holiday,
-    R: Region<H>,
+    R: HolidayRegion<H>,
 {
     fn is_holiday(&self, region: R) -> bool;
     fn holiday(&self, region: R) -> Option<H>;
 }
 
-impl<R, H> TryHoliday<R, H> for NaiveDate
+impl<R, H> ToHoliday<R, H> for NaiveDate
 where
     H: Holiday,
-    R: Region<H>,
+    R: HolidayRegion<H>,
 {
     fn is_holiday(&self, region: R) -> bool {
         region.is_holiday(*self)
@@ -216,7 +216,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::{GermanHolidays, GermanHolidays::*, Germany, Germany::*, Region, TryHoliday};
+    use crate::{GermanHolidays, GermanHolidays::*, Germany, Germany::*, HolidayRegion, ToHoliday};
     use chrono::{Datelike, NaiveDate};
 
     #[test]
