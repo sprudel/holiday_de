@@ -107,13 +107,6 @@ const BUNDESWEITE_FEIERTAGE: &'static [GermanHolidays] = &[
 ];
 
 impl Germany {
-    fn holidays(&self) -> impl Iterator<Item = GermanHolidays> {
-        BUNDESWEITE_FEIERTAGE
-            .iter()
-            .cloned()
-            .chain(self.region_specific_holidays().iter().cloned())
-    }
-
     fn region_specific_holidays(&self) -> &'static [GermanHolidays] {
         match self {
             Germany::BadenWuerttemberg => &[
@@ -166,25 +159,35 @@ trait Region<H>
 where
     H: Holiday,
 {
-    fn is_holiday(&self, date: NaiveDate) -> bool;
-    fn holiday_from_date(&self, date: NaiveDate) -> Option<H>;
-    fn holidays_in_year(&self, year: i32) -> BTreeMap<NaiveDate, H>;
-}
+    fn holidays(&self) -> Vec<H>;
 
-impl Region<GermanHolidays> for Germany {
     fn is_holiday(&self, date: NaiveDate) -> bool {
-        self.holidays()
-            .any(|holiday| holiday.to_date(date.year()) == Some(date))
+        self.holiday_from_date(date).is_some()
     }
-    fn holiday_from_date(&self, date: NaiveDate) -> Option<GermanHolidays> {
+    fn holiday_from_date(&self, date: NaiveDate) -> Option<H> {
         self.holidays()
+            .into_iter()
             .find(|holiday| holiday.to_date(date.year()) == Some(date))
     }
-    fn holidays_in_year(&self, year: i32) -> BTreeMap<NaiveDate, GermanHolidays> {
-        self.holidays()
+    fn holidays_in_year(&self, year: i32) -> Vec<(NaiveDate, H)> {
+        let mut holidays_with_date: Vec<(NaiveDate, H)> = self
+            .holidays()
+            .into_iter()
             .map(|holiday| (holiday.to_date(year), holiday))
             .filter(|(date, _)| date.is_some())
             .map(|(date, holiday)| (date.unwrap(), holiday))
+            .collect();
+        holidays_with_date.sort_by_key(|(date, _)| *date);
+        holidays_with_date
+    }
+}
+
+impl Region<GermanHolidays> for Germany {
+    fn holidays(&self) -> Vec<GermanHolidays> {
+        BUNDESWEITE_FEIERTAGE
+            .iter()
+            .cloned()
+            .chain(self.region_specific_holidays().iter().cloned())
             .collect()
     }
 }
