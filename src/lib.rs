@@ -2,6 +2,7 @@ use chrono::{Datelike, NaiveDate};
 use chrono::{Duration, Weekday};
 use computus;
 use std::collections::BTreeMap;
+use std::fmt::Display;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum GermanHolidays {
@@ -9,11 +10,9 @@ enum GermanHolidays {
     HeiligeDreiKoenige,
     Frauentag,
     Karfreitag,
-    Ostersonntag,
     Ostermontag,
     ErsterMai,
     ChristiHimmelfahrt,
-    Pfingstsonntag,
     Pfingstmontag,
     Fronleichnam,
     AugsburgerFriedensfest,
@@ -63,11 +62,9 @@ impl Holiday for GermanHolidays {
             GermanHolidays::HeiligeDreiKoenige => date(year, 1, 6),
             GermanHolidays::Frauentag => date(year, 1, 8),
             GermanHolidays::Karfreitag => relative_to_easter_sunday(year, -2),
-            GermanHolidays::Ostersonntag => oster_sonntag(year),
             GermanHolidays::Ostermontag => relative_to_easter_sunday(year, 1),
             GermanHolidays::ErsterMai => date(year, 5, 1),
             GermanHolidays::ChristiHimmelfahrt => relative_to_easter_sunday(year, 39),
-            GermanHolidays::Pfingstsonntag => relative_to_easter_sunday(year, 49),
             GermanHolidays::Pfingstmontag => relative_to_easter_sunday(year, 50),
             GermanHolidays::Fronleichnam => relative_to_easter_sunday(year, 60),
             GermanHolidays::AugsburgerFriedensfest => date(year, 8, 8),
@@ -81,17 +78,15 @@ impl Holiday for GermanHolidays {
             GermanHolidays::ZweiterWeihnachtsfeiertag => date(year, 12, 26),
         }
     }
-    fn description(&self) -> &'static str{
+    fn description(&self) -> &'static str {
         match self {
             GermanHolidays::Neujahr => "Neujahr",
             GermanHolidays::HeiligeDreiKoenige => "Heilige Drei Könige",
             GermanHolidays::Frauentag => "Frauentag",
             GermanHolidays::Karfreitag => "Karfreitag",
-            GermanHolidays::Ostersonntag => "Ostersonntag",
             GermanHolidays::Ostermontag => "Ostermontag",
             GermanHolidays::ErsterMai => "Erster Mai",
             GermanHolidays::ChristiHimmelfahrt => "Christi Himmelfahrt",
-            GermanHolidays::Pfingstsonntag => "Pfingstsonntag",
             GermanHolidays::Pfingstmontag => "Pfingstmontag",
             GermanHolidays::Fronleichnam => "Fronleichnam",
             GermanHolidays::AugsburgerFriedensfest => "Augsburger Friedensfest",
@@ -188,8 +183,8 @@ impl Germany {
 }
 
 trait HolidayRegion<H>
-where
-    H: Holiday,
+    where
+        H: Holiday,
 {
     fn holidays(&self) -> Vec<H>;
 
@@ -225,18 +220,18 @@ impl HolidayRegion<GermanHolidays> for Germany {
 }
 
 trait ToHoliday<R, H>
-where
-    H: Holiday,
-    R: HolidayRegion<H>,
+    where
+        H: Holiday,
+        R: HolidayRegion<H>,
 {
     fn is_holiday(&self, region: R) -> bool;
     fn holiday(&self, region: R) -> Option<H>;
 }
 
 impl<R, H> ToHoliday<R, H> for NaiveDate
-where
-    H: Holiday,
-    R: HolidayRegion<H>,
+    where
+        H: Holiday,
+        R: HolidayRegion<H>,
 {
     fn is_holiday(&self, region: R) -> bool {
         region.is_holiday(*self)
