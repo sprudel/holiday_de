@@ -22,66 +22,6 @@ enum GermanHolidays {
     ErsterWeihnachtsfeiertag,
     ZweiterWeihnachtsfeiertag,
 }
-
-impl Holiday for GermanHolidays {
-    fn to_date(&self, year: i32) -> Option<NaiveDate> {
-        match self {
-            GermanHolidays::Neujahr => date(year, 1, 1),
-            GermanHolidays::HeiligeDreiKoenige => date(year, 1, 6),
-            GermanHolidays::Frauentag => date(year, 1, 8),
-            GermanHolidays::Karfreitag => relative_to_easter_sunday(year, -2),
-            GermanHolidays::Ostermontag => relative_to_easter_sunday(year, 1),
-            GermanHolidays::ErsterMai => date(year, 5, 1),
-            GermanHolidays::ChristiHimmelfahrt => relative_to_easter_sunday(year, 39),
-            GermanHolidays::Pfingstmontag => relative_to_easter_sunday(year, 50),
-            GermanHolidays::Fronleichnam => relative_to_easter_sunday(year, 60),
-            GermanHolidays::AugsburgerFriedensfest => date(year, 8, 8),
-            GermanHolidays::MariaeHimmelfahrt => date(year, 8, 15),
-            GermanHolidays::Weltkindertag => date(year, 9, 20),
-            GermanHolidays::TagDerDeutschenEinheit => date(year, 10, 3),
-            GermanHolidays::Reformationstag => date(year, 10, 31),
-            GermanHolidays::Allerheiligen => date(year, 11, 1),
-            GermanHolidays::BussUndBettag => bus_und_bettag(year),
-            GermanHolidays::ErsterWeihnachtsfeiertag => date(year, 12, 25),
-            GermanHolidays::ZweiterWeihnachtsfeiertag => date(year, 12, 26),
-        }
-    }
-    fn description(&self) -> &'static str {
-        match self {
-            GermanHolidays::Neujahr => "Neujahr",
-            GermanHolidays::HeiligeDreiKoenige => "Heilige Drei Könige",
-            GermanHolidays::Frauentag => "Frauentag",
-            GermanHolidays::Karfreitag => "Karfreitag",
-            GermanHolidays::Ostermontag => "Ostermontag",
-            GermanHolidays::ErsterMai => "Erster Mai",
-            GermanHolidays::ChristiHimmelfahrt => "Christi Himmelfahrt",
-            GermanHolidays::Pfingstmontag => "Pfingstmontag",
-            GermanHolidays::Fronleichnam => "Fronleichnam",
-            GermanHolidays::AugsburgerFriedensfest => "Augsburger Friedensfest",
-            GermanHolidays::MariaeHimmelfahrt => "Mariä Himmelfahrt",
-            GermanHolidays::Weltkindertag => "Weltkindertag",
-            GermanHolidays::TagDerDeutschenEinheit => "Tag der Deutschen Einheit",
-            GermanHolidays::Reformationstag => "Reformationstag",
-            GermanHolidays::Allerheiligen => "Allerheiligen",
-            GermanHolidays::BussUndBettag => "Buß- und Bettag",
-            GermanHolidays::ErsterWeihnachtsfeiertag => "1. Weihnachtsfeiertag",
-            GermanHolidays::ZweiterWeihnachtsfeiertag => "2. Weihnachtsfeiertag",
-        }
-    }
-}
-
-const BUNDESWEITE_FEIERTAGE: &'static [GermanHolidays] = &[
-    GermanHolidays::Neujahr,
-    GermanHolidays::Karfreitag,
-    GermanHolidays::Ostermontag,
-    GermanHolidays::ErsterMai,
-    GermanHolidays::ChristiHimmelfahrt,
-    GermanHolidays::Pfingstmontag,
-    GermanHolidays::TagDerDeutschenEinheit,
-    GermanHolidays::ErsterWeihnachtsfeiertag,
-    GermanHolidays::ZweiterWeihnachtsfeiertag,
-];
-
 enum Germany {
     BadenWuerttemberg,
     Bayern,
@@ -101,64 +41,99 @@ enum Germany {
     Thueringen,
 }
 
-impl Germany {
-    fn region_specific_holidays(&self) -> &'static [GermanHolidays] {
+use crate::germany::Germany::*;
+use crate::germany::GermanHolidays::*;
+
+impl HolidayRegion<GermanHolidays> for Germany {
+    fn holidays_in_year(&self, year: i32) -> Vec<GermanHolidays> {
+        let mut holidays = Vec::new();
+        holidays.extend_from_slice(BUNDESWEITE_FEIERTAGE);
+        let region_specific_holidays: &'static [GermanHolidays] = match self {
+            BadenWuerttemberg => &[HeiligeDreiKoenige, Fronleichnam, Allerheiligen],
+            Bayern => &[
+                HeiligeDreiKoenige,
+                Fronleichnam,
+                MariaeHimmelfahrt,
+                Allerheiligen,
+            ],
+            Berlin => &[Frauentag],
+            Brandenburg => &[Reformationstag],
+            Bremen => &[Reformationstag],
+            Hamburg => &[Reformationstag],
+            Hessen => &[Fronleichnam],
+            MechlenburgVorpommern => &[Reformationstag],
+            Niedersachsen => &[Reformationstag],
+            NordrheinWestfalen => &[Fronleichnam, Allerheiligen],
+            RheinlandPfalz => &[Fronleichnam, Allerheiligen],
+            Saarland => &[Fronleichnam, MariaeHimmelfahrt, Allerheiligen],
+            Sachsen => &[Reformationstag, BussUndBettag],
+            SachsenAnhalt => &[HeiligeDreiKoenige, Reformationstag],
+            SchleswigHolstein => &[Reformationstag],
+            Thueringen => &[Weltkindertag, Reformationstag],
+        };
+        holidays.extend_from_slice(region_specific_holidays);
+        holidays
+    }
+}
+
+impl Holiday for GermanHolidays {
+    fn to_date(&self, year: i32) -> Option<NaiveDate> {
         match self {
-            Germany::BadenWuerttemberg => &[
-                GermanHolidays::HeiligeDreiKoenige,
-                GermanHolidays::Fronleichnam,
-                GermanHolidays::Allerheiligen,
-            ],
-            Germany::Bayern => &[
-                GermanHolidays::HeiligeDreiKoenige,
-                GermanHolidays::Fronleichnam,
-                GermanHolidays::MariaeHimmelfahrt,
-                GermanHolidays::Allerheiligen,
-            ],
-            Germany::Berlin => &[GermanHolidays::Frauentag],
-            Germany::Brandenburg => &[GermanHolidays::Reformationstag],
-            Germany::Bremen => &[GermanHolidays::Reformationstag],
-            Germany::Hamburg => &[GermanHolidays::Reformationstag],
-            Germany::Hessen => &[GermanHolidays::Fronleichnam],
-            Germany::MechlenburgVorpommern => &[GermanHolidays::Reformationstag],
-            Germany::Niedersachsen => &[GermanHolidays::Reformationstag],
-            Germany::NordrheinWestfalen => {
-                &[GermanHolidays::Fronleichnam, GermanHolidays::Allerheiligen]
-            }
-            Germany::RheinlandPfalz => {
-                &[GermanHolidays::Fronleichnam, GermanHolidays::Allerheiligen]
-            }
-            Germany::Saarland => &[
-                GermanHolidays::Fronleichnam,
-                GermanHolidays::MariaeHimmelfahrt,
-                GermanHolidays::Allerheiligen,
-            ],
-            Germany::Sachsen => &[
-                GermanHolidays::Reformationstag,
-                GermanHolidays::BussUndBettag,
-            ],
-            Germany::SachsenAnhalt => &[
-                GermanHolidays::HeiligeDreiKoenige,
-                GermanHolidays::Reformationstag,
-            ],
-            Germany::SchleswigHolstein => &[GermanHolidays::Reformationstag],
-            Germany::Thueringen => &[
-                GermanHolidays::Weltkindertag,
-                GermanHolidays::Reformationstag,
-            ],
+            Neujahr => date(year, 1, 1),
+            HeiligeDreiKoenige => date(year, 1, 6),
+            Frauentag => date(year, 1, 8),
+            Karfreitag => relative_to_easter_sunday(year, -2),
+            Ostermontag => relative_to_easter_sunday(year, 1),
+            ErsterMai => date(year, 5, 1),
+            ChristiHimmelfahrt => relative_to_easter_sunday(year, 39),
+            Pfingstmontag => relative_to_easter_sunday(year, 50),
+            Fronleichnam => relative_to_easter_sunday(year, 60),
+            AugsburgerFriedensfest => date(year, 8, 8),
+            MariaeHimmelfahrt => date(year, 8, 15),
+            Weltkindertag => date(year, 9, 20),
+            TagDerDeutschenEinheit => date(year, 10, 3),
+            Reformationstag => date(year, 10, 31),
+            Allerheiligen => date(year, 11, 1),
+            BussUndBettag => bus_und_bettag(year),
+            ErsterWeihnachtsfeiertag => date(year, 12, 25),
+            ZweiterWeihnachtsfeiertag => date(year, 12, 26),
+        }
+    }
+    fn description(&self) -> &'static str {
+        match self {
+            Neujahr => "Neujahr",
+            HeiligeDreiKoenige => "Heilige Drei Könige",
+            Frauentag => "Frauentag",
+            Karfreitag => "Karfreitag",
+            Ostermontag => "Ostermontag",
+            ErsterMai => "Erster Mai",
+            ChristiHimmelfahrt => "Christi Himmelfahrt",
+            Pfingstmontag => "Pfingstmontag",
+            Fronleichnam => "Fronleichnam",
+            AugsburgerFriedensfest => "Augsburger Friedensfest",
+            MariaeHimmelfahrt => "Mariä Himmelfahrt",
+            Weltkindertag => "Weltkindertag",
+            TagDerDeutschenEinheit => "Tag der Deutschen Einheit",
+            Reformationstag => "Reformationstag",
+            Allerheiligen => "Allerheiligen",
+            BussUndBettag => "Buß- und Bettag",
+            ErsterWeihnachtsfeiertag => "1. Weihnachtsfeiertag",
+            ZweiterWeihnachtsfeiertag => "2. Weihnachtsfeiertag",
         }
     }
 }
 
-impl HolidayRegion<GermanHolidays> for Germany {
-    fn holidays_in_year(&self, year: i32) -> Vec<GermanHolidays> {
-        BUNDESWEITE_FEIERTAGE
-            .iter()
-            .cloned()
-            .chain(self.region_specific_holidays().iter().cloned())
-            .collect()
-    }
-}
+const BUNDESWEITE_FEIERTAGE: &'static [GermanHolidays] = &[
+    Neujahr,
+    Karfreitag,
+    Ostermontag,
+    ErsterMai,
+    ChristiHimmelfahrt,
+    Pfingstmontag,
+    TagDerDeutschenEinheit,
+    ErsterWeihnachtsfeiertag,
+    ZweiterWeihnachtsfeiertag,
+];
 
 fn bus_und_bettag(year: i32) -> Option<NaiveDate> {
     let reference_date = NaiveDate::from_ymd(year, 11, 23);
