@@ -22,6 +22,7 @@ enum GermanHolidays {
     ErsterWeihnachtsfeiertag,
     ZweiterWeihnachtsfeiertag,
 }
+
 enum Germany {
     BadenWuerttemberg,
     Bayern,
@@ -41,8 +42,8 @@ enum Germany {
     Thueringen,
 }
 
-use crate::germany::Germany::*;
 use crate::germany::GermanHolidays::*;
+use crate::germany::Germany::*;
 
 impl HolidayRegion<GermanHolidays> for Germany {
     fn holidays_in_year(&self, year: i32) -> Vec<GermanHolidays> {
@@ -56,7 +57,13 @@ impl HolidayRegion<GermanHolidays> for Germany {
                 MariaeHimmelfahrt,
                 Allerheiligen,
             ],
-            Berlin => &[Frauentag],
+            Berlin => {
+                if year >= 2019 {
+                    &[Frauentag]
+                } else {
+                    &[]
+                }
+            }
             Brandenburg => &[Reformationstag],
             Bremen => &[Reformationstag],
             Hamburg => &[Reformationstag],
@@ -81,7 +88,7 @@ impl Holiday for GermanHolidays {
         match self {
             Neujahr => date(year, 1, 1),
             HeiligeDreiKoenige => date(year, 1, 6),
-            Frauentag => date(year, 1, 8),
+            Frauentag => date(year, 3, 8),
             Karfreitag => relative_to_easter_sunday(year, -2),
             Ostermontag => relative_to_easter_sunday(year, 1),
             ErsterMai => date(year, 5, 1),
@@ -148,7 +155,6 @@ fn bus_und_bettag(year: i32) -> Option<NaiveDate> {
 
 #[cfg(test)]
 mod tests {
-
     use crate::germany::GermanHolidays::*;
     use crate::germany::Germany::*;
     use crate::germany::{bus_und_bettag, Germany};
@@ -192,6 +198,17 @@ mod tests {
         assert_eq!(date(2021, 11, 17), bus_und_bettag(2021));
         assert_eq!(date(2022, 11, 16), bus_und_bettag(2022));
         assert_eq!(date(2023, 11, 22), bus_und_bettag(2023));
+    }
+
+    #[test]
+    fn frauntag_in_berlin_since_2019() {
+        assert!(!Berlin.holidays_in_year(2018).contains(&Frauentag));
+        assert_eq!(None, NaiveDate::from_ymd(2018, 3, 8).holiday(Berlin));
+        assert!(Berlin.holidays_in_year(2019).contains(&Frauentag));
+        assert_eq!(
+            Some(Frauentag),
+            NaiveDate::from_ymd(2019, 3, 8).holiday(Berlin)
+        );
     }
 
     proptest! {
