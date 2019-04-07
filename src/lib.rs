@@ -53,6 +53,7 @@ fn bus_und_bettag(year: i32) -> Option<NaiveDate> {
 
 trait Holiday {
     fn to_date(&self, year: i32) -> Option<NaiveDate>;
+    fn description(&self) -> &'static str;
 }
 
 impl Holiday for GermanHolidays {
@@ -78,6 +79,30 @@ impl Holiday for GermanHolidays {
             GermanHolidays::BussUndBettag => bus_und_bettag(year),
             GermanHolidays::ErsterWeihnachtsfeiertag => date(year, 12, 25),
             GermanHolidays::ZweiterWeihnachtsfeiertag => date(year, 12, 26),
+        }
+    }
+    fn description(&self) -> &'static str{
+        match self {
+            GermanHolidays::Neujahr => "Neujahr",
+            GermanHolidays::HeiligeDreiKoenige => "Heilige Drei Könige",
+            GermanHolidays::Frauentag => "Frauentag",
+            GermanHolidays::Karfreitag => "Karfreitag",
+            GermanHolidays::Ostersonntag => "Ostersonntag",
+            GermanHolidays::Ostermontag => "Ostermontag",
+            GermanHolidays::ErsterMai => "Erster Mai",
+            GermanHolidays::ChristiHimmelfahrt => "Christi Himmelfahrt",
+            GermanHolidays::Pfingstsonntag => "Pfingstsonntag",
+            GermanHolidays::Pfingstmontag => "Pfingstmontag",
+            GermanHolidays::Fronleichnam => "Fronleichnam",
+            GermanHolidays::AugsburgerFriedensfest => "Augsburger Friedensfest",
+            GermanHolidays::MariaeHimmelfahrt => "Mariä Himmelfahrt",
+            GermanHolidays::Weltkindertag => "Weltkindertag",
+            GermanHolidays::TagDerDeutschenEinheit => "Tag der Deutschen Einheit",
+            GermanHolidays::Reformationstag => "Reformationstag",
+            GermanHolidays::Allerheiligen => "Allerheiligen",
+            GermanHolidays::BussUndBettag => "Buß- und Bettag",
+            GermanHolidays::ErsterWeihnachtsfeiertag => "1. Weihnachtsfeiertag",
+            GermanHolidays::ZweiterWeihnachtsfeiertag => "2. Weihnachtsfeiertag",
         }
     }
 }
