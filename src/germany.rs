@@ -47,6 +47,9 @@ use crate::germany::Germany::*;
 
 impl HolidayRegion<GermanHolidays> for Germany {
     fn holidays_in_year(&self, year: i32) -> Vec<GermanHolidays> {
+        if year < 1995 {
+            return Vec::new();
+        }
         let mut holidays = Vec::new();
         holidays.extend_from_slice(BUNDESWEITE_FEIERTAGE);
         let region_specific_holidays: &'static [GermanHolidays] = match self {
@@ -209,6 +212,11 @@ mod tests {
             Some(Frauentag),
             NaiveDate::from_ymd(2019, 3, 8).holiday(Berlin)
         );
+    }
+
+    #[test]
+    fn only_provide_holidays_after_1995() {
+        assert!(BadenWuerttemberg.holidays_in_year(1994).is_empty());
     }
 
     proptest! {
