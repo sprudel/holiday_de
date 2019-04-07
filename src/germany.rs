@@ -151,7 +151,7 @@ impl Germany {
 }
 
 impl HolidayRegion<GermanHolidays> for Germany {
-    fn holidays(&self) -> Vec<GermanHolidays> {
+    fn holidays_in_year(&self, year: i32) -> Vec<GermanHolidays> {
         BUNDESWEITE_FEIERTAGE
             .iter()
             .cloned()

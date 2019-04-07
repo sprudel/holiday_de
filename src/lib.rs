@@ -24,26 +24,23 @@ trait HolidayRegion<H>
 where
     H: Holiday,
 {
-    fn holidays(&self) -> Vec<H>;
-
+    fn holidays_in_year(&self, year: i32) -> Vec<H>;
+    fn holiday_dates_in_year(&self, year: i32) -> Vec<(NaiveDate, H)> {
+        let mut holiday_dates: Vec<(NaiveDate, H)> = self
+            .holidays_in_year(year)
+            .into_iter()
+            .flat_map(|holiday| holiday.to_date(year).map(|date| (date, holiday)))
+            .collect();
+        holiday_dates.sort_unstable_by_key(|(date, holiday)| *date);
+        holiday_dates
+    }
     fn is_holiday(&self, date: NaiveDate) -> bool {
         self.holiday_from_date(date).is_some()
     }
     fn holiday_from_date(&self, date: NaiveDate) -> Option<H> {
-        self.holidays()
+        self.holidays_in_year(date.year())
             .into_iter()
             .find(|holiday| holiday.to_date(date.year()) == Some(date))
-    }
-    fn holidays_in_year(&self, year: i32) -> Vec<(NaiveDate, H)> {
-        let mut holidays_with_date: Vec<(NaiveDate, H)> = self
-            .holidays()
-            .into_iter()
-            .map(|holiday| (holiday.to_date(year), holiday))
-            .filter(|(date, _)| date.is_some())
-            .map(|(date, holiday)| (date.unwrap(), holiday))
-            .collect();
-        holidays_with_date.sort_by_key(|(date, _)| *date);
-        holidays_with_date
     }
 }
 
