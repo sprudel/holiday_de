@@ -1,9 +1,7 @@
-use chrono::{Datelike, Duration, NaiveDate, Weekday};
+use chrono::{Datelike, Duration, NaiveDate};
 use computus;
-use std::collections::BTreeMap;
-use std::fmt::Display;
 
-mod germany;
+pub mod germany;
 
 fn date(year: i32, month: u32, day: u32) -> Option<NaiveDate> {
     Some(NaiveDate::from_ymd(year, month, day))
@@ -31,7 +29,7 @@ where
             .into_iter()
             .flat_map(|holiday| holiday.to_date(year).map(|date| (date, holiday)))
             .collect();
-        holiday_dates.sort_unstable_by_key(|(date, holiday)| *date);
+        holiday_dates.sort_unstable_by_key(|(date, _)| *date);
         holiday_dates
     }
     fn is_holiday(&self, date: NaiveDate) -> bool {

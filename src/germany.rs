@@ -2,7 +2,7 @@ use crate::{date, relative_to_easter_sunday, Holiday, HolidayRegion};
 use chrono::{Datelike, Duration, NaiveDate};
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-enum GermanHolidays {
+pub enum GermanHolidays {
     Neujahr,
     HeiligeDreiKoenige,
     Frauentag,
@@ -23,7 +23,7 @@ enum GermanHolidays {
     ZweiterWeihnachtsfeiertag,
 }
 
-enum Germany {
+pub enum Germany {
     BadenWuerttemberg,
     Bayern,
     Berlin,
