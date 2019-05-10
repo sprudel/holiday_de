@@ -45,7 +45,7 @@ pub enum Germany {
 use crate::germany::GermanHolidays::*;
 use crate::germany::Germany::*;
 
-impl HolidayRegion<GermanHolidays> for Germany {
+impl HolidayRegion for Germany {
     fn holidays_in_year(&self, year: i32) -> Vec<GermanHolidays> {
         if year < 1995 {
             return Vec::new();
