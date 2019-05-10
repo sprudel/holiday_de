@@ -19,9 +19,13 @@ pub enum GermanRegion {
     NordrheinWestfalen,
     RheinlandPfalz,
     Saarland,
+    /// Fronleichnam applies only to a minority of communities and has been excluded by default.
+    /// It can be manually calculated via `GermanHoliday::Fronleichnam`.
     Sachsen,
     SachsenAnhalt,
     SchleswigHolstein,
+    /// Fronleichnam applies only to a minority of communities and has been excluded by default.
+    /// It can be manually calculated via `GermanHoliday::Fronleichnam`.
     Thueringen,
 }
 
