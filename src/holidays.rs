@@ -120,4 +120,11 @@ mod tests {
     }
     }
 
+    proptest! {
+    #[test]
+    fn relative_to_easter_sunday_does_not_panic(year: i32, offset: i64) {
+        relative_to_easter_sunday(year, offset);
+    }
+    }
+
 }
