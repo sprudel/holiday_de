@@ -3,6 +3,10 @@ name = "holiday_de"
 version = "0.0.1"
 authors = ["Hannes Herrmann <hannes.herrmann@tngtech.com>"]
 edition = "2018"
+description = "Provides dates for public holidays in Germany since 1995"
+license = "Apache-2.0/MIT"
+readme = "README.md"
+
 
 [dependencies]
 chrono = "0.4"
