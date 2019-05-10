@@ -1,7 +1,7 @@
 use chrono::{Datelike, Duration, NaiveDate};
 use computus;
 
-/// All reoccuring public holidays which exist in Germany.
+/// All reoccurring public holidays which exist in Germany.
 ///
 /// Note that only a *subset* applies to a specific region.
 /// See `GermanRegion` for more details.
@@ -73,8 +73,8 @@ impl GermanHoliday {
             Reformationstag => "Reformationstag",
             Allerheiligen => "Allerheiligen",
             BussUndBettag => "Buß- und Bettag",
-            ErsterWeihnachtsfeiertag => "1. Weihnachtsfeiertag",
-            ZweiterWeihnachtsfeiertag => "2. Weihnachtsfeiertag",
+            ErsterWeihnachtsfeiertag => "Erster Weihnachtsfeiertag",
+            ZweiterWeihnachtsfeiertag => "Zweiter Weihnachtsfeiertag",
         }
     }
 }

@@ -1,3 +1,9 @@
+# holiday_de
+Small crate to calculate public holidays for each German federal state.
+This crate can calculate all *reoccurring* German public holidays, which exist since 1995.
+
+## Documentation
+Find it on [Docs.rs](https://docs.rs/holiday_de)
 
 ## License
 

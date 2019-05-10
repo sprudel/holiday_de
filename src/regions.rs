@@ -35,7 +35,12 @@ impl GermanRegion {
         }
         let mut holidays = Vec::new();
         holidays.extend_from_slice(BUNDESWEITE_FEIERTAGE);
-        let region_specific_holidays: &'static [GermanHoliday] = match self {
+        holidays.extend_from_slice(self.region_specific_holidays(year));
+        holidays
+    }
+
+    fn region_specific_holidays(&self, year: i32) -> &'static [GermanHoliday] {
+        match self {
             BadenWuerttemberg => &[HeiligeDreiKoenige, Fronleichnam, Allerheiligen],
             Bayern => &[
                 HeiligeDreiKoenige,
@@ -63,9 +68,7 @@ impl GermanRegion {
             SachsenAnhalt => &[HeiligeDreiKoenige, Reformationstag],
             SchleswigHolstein => &[Reformationstag],
             Thueringen => &[Weltkindertag, Reformationstag],
-        };
-        holidays.extend_from_slice(region_specific_holidays);
-        holidays
+        }
     }
 
     /// Returns all holidays and their dates in the given year.
@@ -120,8 +123,8 @@ mod tests {
     use proptest::prelude::*;
 
     #[test]
-    fn neujahr_feiertag_in_bayern() {
-        let date = NaiveDate::from_ymd(2018, 01, 01);
+    fn singular_example_holiday() {
+        let date = NaiveDate::from_ymd(2018, 1, 1);
         assert!(date.is_holiday(Bayern));
         assert_eq!(Some(Neujahr), date.holiday(Bayern));
     }
@@ -150,7 +153,7 @@ mod tests {
     }
 
     #[test]
-    fn frauntag_in_berlin_since_2019() {
+    fn frauentag_in_berlin_since_2019() {
         assert!(!Berlin.holidays_in_year(2018).contains(&Frauentag));
         assert_eq!(None, NaiveDate::from_ymd(2018, 3, 8).holiday(Berlin));
         assert!(Berlin.holidays_in_year(2019).contains(&Frauentag));

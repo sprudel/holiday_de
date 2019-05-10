@@ -1,6 +1,6 @@
 //! Small crate to calculate public holidays for each German federal state.
 //!
-//! This crate can calculate all German public holidays, which exist since 1995.
+//! This crate can calculate all *reoccurring* German public holidays, which exist since 1995.
 //! Holidays guaranteed to take place on sundays, e.g. easter sunday, are excluded by default.
 //! However, some holidays occuring on a fixed date can still fall on a sunday.
 //!
