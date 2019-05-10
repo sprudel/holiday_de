@@ -1,19 +1,10 @@
-use chrono::{Duration, NaiveDate};
-use computus;
+use chrono::NaiveDate;
 
-pub mod germany;
+mod holidays;
+mod regions;
 
-use germany::{GermanHoliday, GermanRegion};
-
-fn date(year: i32, month: u32, day: u32) -> Option<NaiveDate> {
-    Some(NaiveDate::from_ymd(year, month, day))
-}
-
-fn relative_to_easter_sunday(year: i32, days_offset: i64) -> Option<NaiveDate> {
-    let easter_sunday = computus::gregorian(year).ok()?;
-    let date = NaiveDate::from_ymd_opt(easter_sunday.year, easter_sunday.month, easter_sunday.day)?;
-    Some(date + Duration::days(days_offset))
-}
+pub use holidays::GermanHoliday;
+pub use regions::GermanRegion;
 
 trait DateExt {
     fn is_holiday(&self, region: GermanRegion) -> bool;
