@@ -15,11 +15,6 @@ fn relative_to_easter_sunday(year: i32, days_offset: i64) -> Option<NaiveDate> {
     Some(date + Duration::days(days_offset))
 }
 
-trait Holiday {
-    fn to_date(&self, year: i32) -> Option<NaiveDate>;
-    fn description(&self) -> &'static str;
-}
-
 trait HolidayRegion {
     fn holidays_in_year(&self, year: i32) -> Vec<GermanHolidays>;
     fn holiday_dates_in_year(&self, year: i32) -> Vec<(NaiveDate, GermanHolidays)> {

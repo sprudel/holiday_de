@@ -1,4 +1,4 @@
-use crate::{date, relative_to_easter_sunday, Holiday, HolidayRegion};
+use crate::{date, relative_to_easter_sunday, HolidayRegion};
 use chrono::{Datelike, Duration, NaiveDate};
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -86,8 +86,8 @@ impl HolidayRegion for Germany {
     }
 }
 
-impl Holiday for GermanHolidays {
-    fn to_date(&self, year: i32) -> Option<NaiveDate> {
+impl GermanHolidays {
+    pub fn to_date(&self, year: i32) -> Option<NaiveDate> {
         match self {
             Neujahr => date(year, 1, 1),
             HeiligeDreiKoenige => date(year, 1, 6),
@@ -109,7 +109,7 @@ impl Holiday for GermanHolidays {
             ZweiterWeihnachtsfeiertag => date(year, 12, 26),
         }
     }
-    fn description(&self) -> &'static str {
+    pub fn description(&self) -> &'static str {
         match self {
             Neujahr => "Neujahr",
             HeiligeDreiKoenige => "Heilige Drei Könige",
