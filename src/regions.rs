@@ -1,5 +1,6 @@
 use chrono::{Datelike, NaiveDate};
 
+/// Represents all regions and there holidays within Germany.
 pub enum GermanRegion {
     BadenWuerttemberg,
     Bayern,
@@ -24,6 +25,9 @@ use crate::holidays::GermanHoliday::*;
 use crate::regions::GermanRegion::*;
 
 impl GermanRegion {
+    /// Returns all holidays in the given year.
+    ///
+    /// For years before 1995 this list will be empty.
     pub fn holidays_in_year(&self, year: i32) -> Vec<GermanHoliday> {
         if year < 1995 {
             return Vec::new();
@@ -63,6 +67,9 @@ impl GermanRegion {
         holidays
     }
 
+    /// Returns all holidays and their dates in the given year.
+    ///
+    /// For years before 1995 this list will be empty.
     pub fn holiday_dates_in_year(&self, year: i32) -> Vec<(NaiveDate, GermanHoliday)> {
         let mut holiday_dates: Vec<(NaiveDate, GermanHoliday)> = self
             .holidays_in_year(year)
@@ -73,10 +80,16 @@ impl GermanRegion {
         holiday_dates
     }
 
+    /// Checks if a given date is a holiday in the specific region.
+    ///
+    /// Always `false` for dates before 1995.
     pub fn is_holiday(&self, date: NaiveDate) -> bool {
         self.holiday_from_date(date).is_some()
     }
 
+    /// Returns the holiday for a specific date if the date is a holiday.
+    ///
+    /// Always `None` for dates before 1995.
     pub fn holiday_from_date(&self, date: NaiveDate) -> Option<GermanHoliday> {
         self.holidays_in_year(date.year())
             .into_iter()

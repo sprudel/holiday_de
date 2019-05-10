@@ -1,6 +1,10 @@
 use chrono::{Datelike, Duration, NaiveDate};
 use computus;
 
+/// All reoccuring public holidays which exist in Germany.
+///
+/// Note that only a *subset* applies to a specific region.
+/// See `GermanRegion` for more details.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum GermanHoliday {
     Neujahr,
@@ -26,6 +30,9 @@ pub enum GermanHoliday {
 use GermanHoliday::*;
 
 impl GermanHoliday {
+    /// Calculates the date for a specific year.
+    ///
+    /// `None` if it cannot be calculated.
     pub fn date(&self, year: i32) -> Option<NaiveDate> {
         match self {
             Neujahr => date(year, 1, 1),
