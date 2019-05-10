@@ -1,9 +1,13 @@
 use chrono::{Datelike, NaiveDate};
 
-/// Represents all regions and there holidays within Germany.
+/// Represents all regions and their holidays within Germany.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum GermanRegion {
     BadenWuerttemberg,
+    /// * The Augsburger Friedensfest only applies to Augsburg.
+    ///   It is excluded by default, but can be calculated via `GermanHoliday::AugsburgerFriedensfest`.
+    /// * Mariä Himmelfahrt only applies to communities with a catholic majority.
+    ///   Since this is the case in the majority of communities, it is included by default.
     Bayern,
     Berlin,
     Brandenburg,
