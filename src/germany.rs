@@ -2,7 +2,7 @@ use crate::{date, relative_to_easter_sunday};
 use chrono::{Datelike, Duration, NaiveDate};
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum GermanHolidays {
+pub enum GermanHoliday {
     Neujahr,
     HeiligeDreiKoenige,
     Frauentag,
@@ -23,7 +23,7 @@ pub enum GermanHolidays {
     ZweiterWeihnachtsfeiertag,
 }
 
-pub enum Germany {
+pub enum GermanRegion {
     BadenWuerttemberg,
     Bayern,
     Berlin,
@@ -42,17 +42,17 @@ pub enum Germany {
     Thueringen,
 }
 
-use crate::germany::GermanHolidays::*;
-use crate::germany::Germany::*;
+use crate::germany::GermanHoliday::*;
+use crate::germany::GermanRegion::*;
 
-impl Germany {
-    pub fn holidays_in_year(&self, year: i32) -> Vec<GermanHolidays> {
+impl GermanRegion {
+    pub fn holidays_in_year(&self, year: i32) -> Vec<GermanHoliday> {
         if year < 1995 {
             return Vec::new();
         }
         let mut holidays = Vec::new();
         holidays.extend_from_slice(BUNDESWEITE_FEIERTAGE);
-        let region_specific_holidays: &'static [GermanHolidays] = match self {
+        let region_specific_holidays: &'static [GermanHoliday] = match self {
             BadenWuerttemberg => &[HeiligeDreiKoenige, Fronleichnam, Allerheiligen],
             Bayern => &[
                 HeiligeDreiKoenige,
@@ -85,11 +85,11 @@ impl Germany {
         holidays
     }
 
-    pub fn holiday_dates_in_year(&self, year: i32) -> Vec<(NaiveDate, GermanHolidays)> {
-        let mut holiday_dates: Vec<(NaiveDate, GermanHolidays)> = self
+    pub fn holiday_dates_in_year(&self, year: i32) -> Vec<(NaiveDate, GermanHoliday)> {
+        let mut holiday_dates: Vec<(NaiveDate, GermanHoliday)> = self
             .holidays_in_year(year)
             .into_iter()
-            .flat_map(|holiday| holiday.to_date(year).map(|date| (date, holiday)))
+            .flat_map(|holiday| holiday.date(year).map(|date| (date, holiday)))
             .collect();
         holiday_dates.sort_unstable_by_key(|(date, _)| *date);
         holiday_dates
@@ -99,15 +99,15 @@ impl Germany {
         self.holiday_from_date(date).is_some()
     }
 
-    pub fn holiday_from_date(&self, date: NaiveDate) -> Option<GermanHolidays> {
+    pub fn holiday_from_date(&self, date: NaiveDate) -> Option<GermanHoliday> {
         self.holidays_in_year(date.year())
             .into_iter()
-            .find(|holiday| holiday.to_date(date.year()) == Some(date))
+            .find(|holiday| holiday.date(date.year()) == Some(date))
     }
 }
 
-impl GermanHolidays {
-    pub fn to_date(&self, year: i32) -> Option<NaiveDate> {
+impl GermanHoliday {
+    pub fn date(&self, year: i32) -> Option<NaiveDate> {
         match self {
             Neujahr => date(year, 1, 1),
             HeiligeDreiKoenige => date(year, 1, 6),
@@ -153,7 +153,7 @@ impl GermanHolidays {
     }
 }
 
-const BUNDESWEITE_FEIERTAGE: &'static [GermanHolidays] = &[
+const BUNDESWEITE_FEIERTAGE: &'static [GermanHoliday] = &[
     Neujahr,
     Karfreitag,
     Ostermontag,
@@ -178,10 +178,10 @@ fn bus_und_bettag(year: i32) -> Option<NaiveDate> {
 
 #[cfg(test)]
 mod tests {
-    use crate::germany::GermanHolidays::*;
-    use crate::germany::Germany::*;
-    use crate::germany::{bus_und_bettag, Germany};
-    use crate::{date, ToHoliday};
+    use crate::germany::GermanHoliday::*;
+    use crate::germany::GermanRegion::*;
+    use crate::germany::{bus_und_bettag, GermanRegion};
+    use crate::{date, DateExt};
     use chrono::{Datelike, NaiveDate, Weekday};
     use proptest::prelude::*;
 
@@ -194,7 +194,7 @@ mod tests {
 
     #[test]
     fn total_number_holidays() {
-        let number_holidays = |region: Germany| region.holidays_in_year(2019).len();
+        let number_holidays = |region: GermanRegion| region.holidays_in_year(2019).len();
         assert_eq!(12, number_holidays(BadenWuerttemberg));
         assert_eq!(13, number_holidays(Bayern));
         assert_eq!(10, number_holidays(Berlin));
