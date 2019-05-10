@@ -1,6 +1,7 @@
 use chrono::{Datelike, NaiveDate};
 
 /// Represents all regions and there holidays within Germany.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum GermanRegion {
     BadenWuerttemberg,
     Bayern,
