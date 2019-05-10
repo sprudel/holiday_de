@@ -3,7 +3,7 @@ use computus;
 
 pub mod germany;
 
-use germany::GermanHolidays;
+use germany::{GermanHolidays, Germany};
 
 fn date(year: i32, month: u32, day: u32) -> Option<NaiveDate> {
     Some(NaiveDate::from_ymd(year, month, day))
@@ -41,22 +41,16 @@ trait HolidayRegion {
     }
 }
 
-trait ToHoliday<R>
-where
-    R: HolidayRegion,
-{
-    fn is_holiday(&self, region: R) -> bool;
-    fn holiday(&self, region: R) -> Option<GermanHolidays>;
+trait ToHoliday {
+    fn is_holiday(&self, region: Germany) -> bool;
+    fn holiday(&self, region: Germany) -> Option<GermanHolidays>;
 }
 
-impl<R> ToHoliday<R> for NaiveDate
-where
-    R: HolidayRegion,
-{
-    fn is_holiday(&self, region: R) -> bool {
+impl ToHoliday for NaiveDate {
+    fn is_holiday(&self, region: Germany) -> bool {
         region.is_holiday(*self)
     }
-    fn holiday(&self, region: R) -> Option<GermanHolidays> {
+    fn holiday(&self, region: Germany) -> Option<GermanHolidays> {
         region.holiday_from_date(*self)
     }
 }
