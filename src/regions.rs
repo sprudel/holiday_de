@@ -117,6 +117,7 @@ mod tests {
     use crate::regions::GermanRegion::*;
     use crate::DateExt;
     use chrono::NaiveDate;
+    use proptest::prelude::*;
 
     #[test]
     fn neujahr_feiertag_in_bayern() {
@@ -125,9 +126,10 @@ mod tests {
         assert_eq!(Some(Neujahr), date.holiday(Bayern));
     }
 
+    proptest! {
     #[test]
-    fn total_number_holidays() {
-        let number_holidays = |region: GermanRegion| region.holidays_in_year(2019).len();
+    fn total_number_holidays(year in 2019i32..) {
+        let number_holidays = |region: GermanRegion| region.holidays_in_year(year).len();
         assert_eq!(12, number_holidays(BadenWuerttemberg));
         assert_eq!(13, number_holidays(Bayern));
         assert_eq!(10, number_holidays(Berlin));
@@ -145,6 +147,7 @@ mod tests {
         assert_eq!(10, number_holidays(SchleswigHolstein));
         assert_eq!(11, number_holidays(Thueringen));
     }
+    }
 
     #[test]
     fn frauntag_in_berlin_since_2019() {
@@ -157,9 +160,11 @@ mod tests {
         );
     }
 
+    proptest! {
     #[test]
-    fn only_provide_holidays_after_1995() {
-        assert!(BadenWuerttemberg.holidays_in_year(1994).is_empty());
+    fn only_provide_holidays_after_1995(year in -2999i32..1995) {
+        assert!(BadenWuerttemberg.holidays_in_year(year).is_empty());
+    }
     }
 
 }
