@@ -6,7 +6,7 @@ edition = "2018"
 description = "Provides dates for public holidays in Germany since 1995"
 license = "Apache-2.0/MIT"
 readme = "README.md"
-
+documentation = "https://docs.rs/holiday_de"
 
 [dependencies]
 chrono = "0.4"
