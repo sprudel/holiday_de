@@ -6,7 +6,7 @@ mod regions;
 pub use holidays::GermanHoliday;
 pub use regions::GermanRegion;
 
-trait DateExt {
+pub trait DateExt {
     fn is_holiday(&self, region: GermanRegion) -> bool;
     fn holiday(&self, region: GermanRegion) -> Option<GermanHoliday>;
 }
