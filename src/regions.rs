@@ -133,8 +133,8 @@ mod tests {
     #[test]
     fn singular_example_holiday() {
         let date = NaiveDate::from_ymd(2018, 1, 1);
-        assert!(date.is_holiday(Bayern));
-        assert_eq!(Some(Neujahr), date.holiday(Bayern));
+        assert!(date.is_public_holiday_in(Bayern));
+        assert_eq!(Some(Neujahr), date.public_holiday_in(Bayern));
     }
 
     proptest! {
@@ -163,11 +163,14 @@ mod tests {
     #[test]
     fn frauentag_in_berlin_since_2019() {
         assert!(!Berlin.holidays_in_year(2018).contains(&Frauentag));
-        assert_eq!(None, NaiveDate::from_ymd(2018, 3, 8).holiday(Berlin));
+        assert_eq!(
+            None,
+            NaiveDate::from_ymd(2018, 3, 8).public_holiday_in(Berlin)
+        );
         assert!(Berlin.holidays_in_year(2019).contains(&Frauentag));
         assert_eq!(
             Some(Frauentag),
-            NaiveDate::from_ymd(2019, 3, 8).holiday(Berlin)
+            NaiveDate::from_ymd(2019, 3, 8).public_holiday_in(Berlin)
         );
     }
 

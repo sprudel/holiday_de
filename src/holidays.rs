@@ -1,15 +1,18 @@
 use chrono::{Datelike, Duration, NaiveDate};
 use computus;
 
-/// All reoccurring public holidays which exist in Germany.
+/// All reoccurring holidays which exist in Germany.
+/// This list contains both public and non-public holidays.
 ///
-/// Note that only a *subset* applies to a specific region.
-/// See `GermanRegion` for more details.
+/// If a holiday is a public holiday differs from region to region,
+/// use `GermanRegion` for public holidays instead.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum GermanHoliday {
     Neujahr,
     HeiligeDreiKoenige,
     Frauentag,
+    Faschingsdienstag,
+    Aschermittwoch,
     Karfreitag,
     Ostermontag,
     ErsterMai,
@@ -23,8 +26,10 @@ pub enum GermanHoliday {
     Reformationstag,
     Allerheiligen,
     BussUndBettag,
+    Heiligabend,
     ErsterWeihnachtsfeiertag,
     ZweiterWeihnachtsfeiertag,
+    Silvester,
 }
 
 use GermanHoliday::*;
@@ -38,6 +43,8 @@ impl GermanHoliday {
             Neujahr => date(year, 1, 1),
             HeiligeDreiKoenige => date(year, 1, 6),
             Frauentag => date(year, 3, 8),
+            Faschingsdienstag => relative_to_easter_sunday(year, -47),
+            Aschermittwoch => relative_to_easter_sunday(year, -46),
             Karfreitag => relative_to_easter_sunday(year, -2),
             Ostermontag => relative_to_easter_sunday(year, 1),
             ErsterMai => date(year, 5, 1),
@@ -51,8 +58,10 @@ impl GermanHoliday {
             Reformationstag => date(year, 10, 31),
             Allerheiligen => date(year, 11, 1),
             BussUndBettag => bus_und_bettag(year),
+            Heiligabend => date(year, 12, 24),
             ErsterWeihnachtsfeiertag => date(year, 12, 25),
             ZweiterWeihnachtsfeiertag => date(year, 12, 26),
+            Silvester => date(year, 12, 31),
         }
     }
     pub fn description(&self) -> &'static str {
@@ -60,6 +69,8 @@ impl GermanHoliday {
             Neujahr => "Neujahr",
             HeiligeDreiKoenige => "Heilige Drei Könige",
             Frauentag => "Frauentag",
+            Faschingsdienstag => "Faschingsdienstag",
+            Aschermittwoch => "Aschermittwoch",
             Karfreitag => "Karfreitag",
             Ostermontag => "Ostermontag",
             ErsterMai => "Erster Mai",
@@ -73,8 +84,10 @@ impl GermanHoliday {
             Reformationstag => "Reformationstag",
             Allerheiligen => "Allerheiligen",
             BussUndBettag => "Buß- und Bettag",
+            Heiligabend => "Heiligabend",
             ErsterWeihnachtsfeiertag => "Erster Weihnachtsfeiertag",
             ZweiterWeihnachtsfeiertag => "Zweiter Weihnachtsfeiertag",
+            Silvester => "Silvester",
         }
     }
 }
