@@ -113,7 +113,7 @@ fn bus_und_bettag(year: i32) -> Option<NaiveDate> {
 }
 
 fn date(year: i32, month: u32, day: u32) -> Option<NaiveDate> {
-    Some(NaiveDate::from_ymd(year, month, day))
+    NaiveDate::from_ymd_opt(year, month, day)
 }
 
 fn relative_to_easter_sunday(year: i32, days_offset: i64) -> Option<NaiveDate> {
