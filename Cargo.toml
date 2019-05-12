@@ -4,10 +4,11 @@ version = "0.1.0"
 authors = ["Hannes Herrmann <hannes.herrmann@tngtech.com>"]
 edition = "2018"
 description = "Provides dates for public holidays in Germany since 1995"
-license = "Apache-2.0/MIT"
+license = "Apache-2.0 AND MIT"
 readme = "README.md"
 documentation = "https://docs.rs/holiday_de"
 repository = "https://github.com/sprudel/holiday_de"
+keywords = ["holiday", "Germany", "Feiertage"]
 
 [dependencies]
 chrono = "0.4"
