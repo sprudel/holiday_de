@@ -1,6 +1,9 @@
 use chrono::{Datelike, NaiveDate};
 
-/// Represents all regions and their holidays within Germany.
+/// Represents all regions and their public holidays within Germany.
+///
+/// Holidays guaranteed to take place on sundays, e.g. easter sunday, are excluded by default.
+/// However, holidays with a fixed date can still fall on a sunday.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum GermanRegion {
     BadenWuerttemberg,
@@ -34,7 +37,8 @@ use crate::holidays::GermanHoliday::*;
 use crate::regions::GermanRegion::*;
 
 impl GermanRegion {
-    /// Returns all holidays in the given year.
+    /// Returns all public holidays in the given year.
+    /// Holidays guaranteed to take place on sundays, e.g. easter sunday, are excluded by default.
     ///
     /// For years before 1995 this list will be empty.
     pub fn holidays_in_year(&self, year: i32) -> Vec<GermanHoliday> {
@@ -80,6 +84,7 @@ impl GermanRegion {
     }
 
     /// Returns all holidays and their dates in the given year.
+    /// Holidays guaranteed to take place on sundays, e.g. easter sunday, are excluded by default.
     ///
     /// For years before 1995 this list will be empty.
     pub fn holiday_dates_in_year(&self, year: i32) -> Vec<(NaiveDate, GermanHoliday)> {
@@ -92,14 +97,14 @@ impl GermanRegion {
         holiday_dates
     }
 
-    /// Checks if a given date is a holiday in the specific region.
+    /// Checks if a given date is a public holiday in the specific region.
     ///
     /// Always `false` for dates before 1995.
     pub fn is_holiday(&self, date: NaiveDate) -> bool {
         self.holiday_from_date(date).is_some()
     }
 
-    /// Returns the holiday for a specific date if the date is a holiday.
+    /// Returns the holiday for a specific date if the date is a holiday in the specific region.
     ///
     /// Always `None` for dates before 1995.
     pub fn holiday_from_date(&self, date: NaiveDate) -> Option<GermanHoliday> {

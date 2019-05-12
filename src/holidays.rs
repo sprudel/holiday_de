@@ -1,11 +1,11 @@
 use chrono::{Datelike, Duration, NaiveDate};
 use computus;
 
-/// All reoccurring holidays which exist in Germany.
+/// All reoccurring holidays in Germany.
 /// This list contains both public and non-public holidays.
 ///
-/// If a holiday is a public holiday differs from region to region,
-/// use `GermanRegion` for public holidays instead.
+/// For public holidays use `GermanRegion` instead, since
+/// public holidays differ from region to region.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum GermanHoliday {
     Neujahr,
