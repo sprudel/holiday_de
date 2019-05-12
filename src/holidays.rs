@@ -116,18 +116,9 @@ fn relative_to_easter_sunday(year: i32, days_offset: i64) -> Option<NaiveDate> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::DateExt;
     use chrono::Weekday;
     use proptest::prelude::*;
-
-    #[test]
-    fn test_bus_und_bettag_calc() {
-        assert_eq!(date(2018, 11, 21), bus_und_bettag(2018));
-        assert_eq!(date(2019, 11, 20), bus_und_bettag(2019));
-        assert_eq!(date(2020, 11, 18), bus_und_bettag(2020));
-        assert_eq!(date(2021, 11, 17), bus_und_bettag(2021));
-        assert_eq!(date(2022, 11, 16), bus_und_bettag(2022));
-        assert_eq!(date(2023, 11, 22), bus_und_bettag(2023));
-    }
 
     proptest! {
     #[test]
@@ -145,6 +136,52 @@ mod tests {
     fn relative_to_easter_sunday_does_not_panic(year: i32, offset: i64) {
         relative_to_easter_sunday(year, offset);
     }
+    }
+
+    macro_rules! holiday_tests {
+    ($($name:ident: $holiday:expr, $date:expr,)*) => {
+    $(
+        #[test]
+        fn $name() {
+            let holiday: GermanHoliday = $holiday;
+            let (year, month, day) = $date;
+            let date = NaiveDate::from_ymd(year, month, day);
+            assert!(date.is_holiday(holiday));
+        }
+    )*
+    }
+}
+
+    holiday_tests! {
+        neujahr: Neujahr, (2019, 1, 1),
+        dreikoenige: HeiligeDreiKoenige, (2019, 1, 6),
+        frauentag: Frauentag, (2019, 3, 8),
+        faschingdienstag: Faschingsdienstag, (2019, 3, 5),
+        aschermittwoch: Aschermittwoch, (2019, 3, 6),
+        karfreitag: Karfreitag, (2019, 4, 19),
+        ostermontag: Ostermontag, (2019, 4, 22),
+        erstermai: ErsterMai, (2019, 5, 1),
+        christi_himmelfahrt: ChristiHimmelfahrt, (2019, 5, 30),
+        pfingstmontag: Pfingstmontag, (2019, 6, 10),
+        fronleichnam: Fronleichnam, (2019, 6, 20),
+        augsburger_friedensfest: AugsburgerFriedensfest, (2019, 8, 8),
+        mariae_himmelfahrt: MariaeHimmelfahrt, (2019, 8, 15),
+        weltkindertag: Weltkindertag, (2019, 9, 20),
+        deutsche_einheit: TagDerDeutschenEinheit, (2019, 10, 3),
+        reformationstag: Reformationstag, (2019, 10, 31),
+        allerheiligen: Allerheiligen, (2019, 11, 1),
+
+        bus_und_bettag1: BussUndBettag, (2018, 11, 21),
+        bus_und_bettag2: BussUndBettag, (2019, 11, 20),
+        bus_und_bettag3: BussUndBettag, (2020, 11, 18),
+        bus_und_bettag4: BussUndBettag, (2021, 11, 17),
+        bus_und_bettag5: BussUndBettag, (2022, 11, 16),
+        bus_und_bettag6: BussUndBettag, (2023, 11, 22),
+
+        heiligabend: Heiligabend, (2019, 12, 24),
+        erster_weihnachtsfeiertag: ErsterWeihnachtsfeiertag, (2019, 12, 25),
+        zweiter_weihnachtsfeiertag: ZweiterWeihnachtsfeiertag, (2019, 12, 26),
+        silvester: Silvester, (2019, 12, 31),
     }
 
 }
