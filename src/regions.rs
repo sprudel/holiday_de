@@ -48,6 +48,16 @@ impl GermanRegion {
         let mut holidays = Vec::new();
         holidays.extend_from_slice(BUNDESWEITE_FEIERTAGE);
         holidays.extend_from_slice(self.region_specific_holidays(year));
+        if year == 2017 && !holidays.contains(&Reformationstag) {
+            // BW: https://www.landesrecht-bw.de/perma?d=jlr-FeiertGBWV1P1a
+            // BY: https://www.bayern.landtag.de/www/ElanTextAblage_WP17/Drucksachen/Folgedrucksachen/0000007000/0000007463.pdf
+            // BE: https://gesetze.berlin.de/bsbe/document/aiz-jlr-FeiertGBErahmen%4020151025/part/x
+            // HE: https://www.rv.hessenrecht.hessen.de/bshe/document/jlr-RefT2017VHErahmen/part/X
+            // NW: https://www.landtag.nrw.de/portal/WWW/dokumentenarchiv/Dokument?Id=XMMGVB1528%7C496%7C496
+            // RP: https://web.archive.org/web/20160305005630/https://www.rlp.de/fr/aktuelles/einzelansicht/news/detail/News/zusaetzlicher-feiertag-2017/
+            // SL: https://web.archive.org/web/20160306062414/http://sl.juris.de/cgi-bin/landesrecht.py?d=http%3A%2F%2Fsl.juris.de%2Fsl%2Fgesamt%2FRefT2017V_SL.htm
+            holidays.push(Reformationstag);
+        }
         holidays
     }
 
@@ -68,18 +78,54 @@ impl GermanRegion {
                 }
             }
             Brandenburg => &[Reformationstag],
-            Bremen => &[Reformationstag],
-            Hamburg => &[Reformationstag],
+            Bremen => {
+                if year >= 2017 {
+                    &[Reformationstag]
+                } else {
+                    &[]
+                }
+            }
+            Hamburg => {
+                if year >= 2017 {
+                    &[Reformationstag]
+                } else {
+                    &[]
+                }
+            }
             Hessen => &[Fronleichnam],
-            MechlenburgVorpommern => &[Reformationstag],
-            Niedersachsen => &[Reformationstag],
+            MechlenburgVorpommern => {
+                if year >= 2023 {
+                    &[Frauentag, Reformationstag]
+                } else {
+                    &[Reformationstag]
+                }
+            }
+            Niedersachsen => {
+                if year >= 2017 {
+                    &[Reformationstag]
+                } else {
+                    &[]
+                }
+            }
             NordrheinWestfalen => &[Fronleichnam, Allerheiligen],
             RheinlandPfalz => &[Fronleichnam, Allerheiligen],
             Saarland => &[Fronleichnam, MariaeHimmelfahrt, Allerheiligen],
             Sachsen => &[Reformationstag, BussUndBettag],
             SachsenAnhalt => &[HeiligeDreiKoenige, Reformationstag],
-            SchleswigHolstein => &[Reformationstag],
-            Thueringen => &[Weltkindertag, Reformationstag],
+            SchleswigHolstein => {
+                if year >= 2017 {
+                    &[Reformationstag]
+                } else {
+                    &[]
+                }
+            }
+            Thueringen => {
+                if year >= 2019 {
+                    &[Weltkindertag, Reformationstag]
+                } else {
+                    &[Reformationstag]
+                }
+            }
         }
     }
 
@@ -144,7 +190,7 @@ mod tests {
 
     proptest! {
     #[test]
-    fn total_number_holidays(year in 2019i32..) {
+    fn total_number_holidays(year in 2023i32..) {
         let number_holidays = |region: GermanRegion| region.holidays_in_year(year).len();
         assert_eq!(12, number_holidays(BadenWuerttemberg));
         assert_eq!(13, number_holidays(Bayern));
@@ -153,7 +199,7 @@ mod tests {
         assert_eq!(10, number_holidays(Bremen));
         assert_eq!(10, number_holidays(Hamburg));
         assert_eq!(10, number_holidays(Hessen));
-        assert_eq!(10, number_holidays(MechlenburgVorpommern));
+        assert_eq!(11, number_holidays(MechlenburgVorpommern));
         assert_eq!(10, number_holidays(Niedersachsen));
         assert_eq!(11, number_holidays(NordrheinWestfalen));
         assert_eq!(11, number_holidays(RheinlandPfalz));
