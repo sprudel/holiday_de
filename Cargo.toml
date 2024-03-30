@@ -1,6 +1,6 @@
 [package]
 name = "holiday_de"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Hannes Herrmann <hannes.herrmann@tngtech.com>"]
 edition = "2018"
 description = "Provides dates for public holidays in Germany since 1995"
