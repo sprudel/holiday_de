@@ -71,7 +71,14 @@ impl GermanRegion {
                 Allerheiligen,
             ],
             Berlin => {
-                if year >= 2019 {
+                if year == 2020 || year == 2025 {
+                    // 2020: https://gesetze.berlin.de/bsbe/document/aiz-jlr-FeiertGBErahmen%4020190207
+                    // 2025: https://gesetze.berlin.de/bsbe/document/jlr-FeiertGBErahmen
+                    &[Frauentag, TagDerBefreiung]
+                } else if year == 2028 {
+                    // https://gesetze.berlin.de/bsbe/document/aiz-jlr-FeiertGBErahmen%4020250509
+                    &[Frauentag, SiebzehnterJuni]
+                } else if year >= 2019 {
                     &[Frauentag]
                 } else {
                     &[]
